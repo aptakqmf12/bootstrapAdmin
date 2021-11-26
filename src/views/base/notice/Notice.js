@@ -12,10 +12,17 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 
 const Notice = () => {
   const [data, setData] = useState([])
+
+  const styleCenter = {
+    display: 'flex',
+    justifyContent: 'center',
+  }
 
   useEffect(() => {
     fetch('http://localhost:3005/api/notice/list', {
@@ -48,20 +55,37 @@ const Notice = () => {
           </CTableHead>
 
           <CTableBody>
-            <CTableRow>
-              {data.map((e, i) => {
-                console.log(e.SUBJECT, i)
-                return (
-                  <>
-                    <CTableDataCell key={e.ID + i}>{e.ID}</CTableDataCell>
-                    <CTableDataCell key={e.SUBJECT + i}>{e.SUBJECT}</CTableDataCell>
-                    <CTableDataCell key={e.CONTENT + i}>{e.CONTENT}</CTableDataCell>
-                  </>
-                )
-              })}
-            </CTableRow>
+            {data.map((e, i) => {
+              return (
+                <>
+                  <CTableRow>
+                    <CTableDataCell key={e.ID}>{e.ID}</CTableDataCell>
+                    <CTableDataCell key={e.SUBJECT}>{e.SUBJECT}</CTableDataCell>
+                    <CTableDataCell key={e.CONTENT}>{e.CONTENT}</CTableDataCell>
+                    <CTableDataCell key={e.CREATED}>{e.CREATED}</CTableDataCell>
+                    <CTableDataCell key={e.MODIFIED}>{e.MODIFIED}</CTableDataCell>
+                  </CTableRow>
+                </>
+              )
+            })}
           </CTableBody>
         </CTable>
+
+        <CPagination aria-label="Page navigation example" style={styleCenter}>
+          <CPaginationItem aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </CPaginationItem>
+          {data.map((e, i) => {
+            return (
+              <>
+                <CPaginationItem>{i + 1}</CPaginationItem>
+              </>
+            )
+          })}
+          <CPaginationItem aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </CPaginationItem>
+        </CPagination>
       </CCardBody>
     </CCard>
   )
