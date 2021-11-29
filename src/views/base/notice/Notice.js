@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import Pagination from 'rc-pagination'
 import {
@@ -19,46 +19,61 @@ import {
 } from '@coreui/react'
 
 const Notice = () => {
-  const [data, setData] = useState([])
-  const [value, setValue] = useState({
-    ID: 0,
-    SUBJECT: '23',
-    CONTENT: '43',
-    CRADTED: new Date(),
-    MODIFIED: new Date(),
-  })
-
-  const onChangeInput = (e) => {}
-
-  const onSubmitForm = (e) => {
-    e.preventDefault()
-    alert('add')
-    setData([
-      ...data,
-      {
-        //post 보낼땐 camel케이스로.
-        ID: data.length + 1,
-        SUBJECT: 1,
-        CONTENT: 2,
-        CRADTED: new Date(),
-        MODIFIED: new Date(),
-      },
-    ])
-  }
-
+  //style
   const styleCenter = {
     display: 'flex',
     justifyContent: 'center',
   }
+  // var
+  const [list, setList] = useState([])
+  const [inputs, setInputs] = useState({
+    SUBJECT: '',
+    CONTENT: '',
+  })
+  const { SUBJECT, CONTENT } = inputs
+  const focusInput = useRef()
 
-  useEffect(() => {
-    async function fetchData() {
-      const res = await axios.get('http://localhost:3005/api/notice/list')
-      setData(res.data.data)
+  //methods
+  const onChangeInput = (e) => {
+    const { value, name } = e.target
+    setInputs({
+      ...inputs,
+      [name]: value,
+    })
+  }
+  const onSubmitForm = (e) => {
+    e.preventDefault()
+    if (SUBJECT !== '' && CONTENT !== '') {
+      setList([
+        ...list,
+        {
+          //post 보낼땐 camel케이스로.
+          ID: 0,
+          SUBJECT: SUBJECT,
+          CONTENT: CONTENT,
+        },
+      ])
+
+      setInputs({
+        SUBJECT: '',
+        CONTENT: '',
+      })
+    } else {
+      alert('값을 입력해주세요')
     }
-    return fetchData()
+    focusInput.current.focus()
+  }
+  const onDeleteList = (idx) => {
+    setList(list.filter((e) => e.ID !== idx))
+  }
+  //useEffect
+  useEffect(() => {
+    // async function fetchData() {
+    //   const res = await axios.get('http://localhost:3005/api/notice/list')
+    //   setList(res.data.data)
+    // }
+    // return fetchData()
   }, [])
-
   return (
     <>
       <CCard>
@@ -72,19 +87,26 @@ const Notice = () => {
                 <CTableHeaderCell scope="col">id</CTableHeaderCell>
                 <CTableHeaderCell scope="col">SUBJECT</CTableHeaderCell>
                 <CTableHeaderCell scope="col">CONTENT</CTableHeaderCell>
-                <CTableHeaderCell scope="col">CREATED</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
 
             <CTableBody>
-              {data.map((e, i) => {
+              {list.map((e, i) => {
                 return (
                   <>
                     <CTableRow key={e.id}>
                       <CTableDataCell>{e.ID}</CTableDataCell>
                       <CTableDataCell>{e.SUBJECT}</CTableDataCell>
                       <CTableDataCell>{e.CONTENT}</CTableDataCell>
-                      <CTableDataCell>{e.CREATED}</CTableDataCell>
+                      <CTableDataCell>
+                        <button
+                          onClick={() => {
+                            onDeleteList(e.ID)
+                          }}
+                        >
+                          삭제
+                        </button>
+                      </CTableDataCell>
                     </CTableRow>
                   </>
                 )
@@ -107,24 +129,23 @@ const Notice = () => {
         <form onSubmit={onSubmitForm}>
           <fieldset>
             <legend>게시글 추가</legend>
+            <label htmlFor={'SUBJECT'}>게시글 SUBJECT</label>
+            <input
+              name="SUBJECT"
+              className="SUBJECT"
+              value={SUBJECT}
+              onChange={onChangeInput}
+              ref={focusInput}
+            ></input>
 
             <label htmlFor={'CONTENT'}>게시글 CONTENT</label>
             <input
-              name="content"
+              name="CONTENT"
               className="CONTENT"
-              value={value.CONTENT}
+              value={CONTENT}
               onChange={onChangeInput}
             ></input>
-
-            <label htmlFor={'SUBJECT'}>게시글 SUBJECT</label>
-            <input
-              name="subject"
-              className="SUBJECT"
-              value={value.SUBJECT}
-              onChange={onChangeInput}
-            ></input>
-
-            <button type="submit">추가!</button>
+            <button type="submit">go</button>
           </fieldset>
         </form>
       </div>
