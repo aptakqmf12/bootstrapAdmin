@@ -149,6 +149,7 @@ const Notice = () => {
           </fieldset>
         </form>
       </div>
+
     </>
   )
 }
