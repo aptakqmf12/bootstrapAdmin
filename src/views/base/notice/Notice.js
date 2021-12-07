@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import Pagination from 'rc-pagination'
+import RCPagination from 'rc-pagination'
+// import '../../assets/index.less';
+// import 'rc-select/assets/index.less';
+import '../../../../node_modules/rc-pagination/assets/index.css'
+import Modal from 'react-modal'
 import {
   CCard,
   CCardBody,
@@ -17,12 +21,16 @@ import {
   CPagination,
   CPaginationItem,
 } from '@coreui/react'
-
+Modal.setAppElement('#root')
 const Notice = () => {
   //style
   const styleCenter = {
     display: 'flex',
     justifyContent: 'center',
+  }
+  const writeBox = {
+    display: 'flex',
+    justifyContent: 'flex-end',
   }
   // var
   const [list, setList] = useState([])
@@ -30,8 +38,35 @@ const Notice = () => {
     SUBJECT: '',
     CONTENT: '',
   })
+  const [modal, setModal] = useState(false)
+  // pagination
+  const [currentPage, setCurrentPage] = useState(3)
   const { SUBJECT, CONTENT } = inputs
   const focusInput = useRef()
+
+  useEffect(async () => {
+    try {
+      // const res = await axios.get('http://localhost:3005/api/notice/list', {})
+      // setList(res.data.data)
+
+      const res = await axios.get(`http://localhost:3005/api/notice/get?id=1`, {})
+      console.log(res.data.data)
+    } catch (e) {
+      console.error(e.message)
+    }
+  }, [])
+
+  const addData = async (subjectValue, contentValue) => {
+    try {
+      const res = await axios.post('http://localhost:3005/api/notice/create', {
+        id: 0,
+        subject: subjectValue,
+        content: contentValue,
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   //methods
   const onChangeInput = (e) => {
@@ -48,11 +83,12 @@ const Notice = () => {
         ...list,
         {
           //post 보낼땐 camel케이스로.
-          ID: 0,
+          ID: list.length + 1, //데이터로 받은 list다음에 붙이기
           SUBJECT: SUBJECT,
           CONTENT: CONTENT,
         },
       ])
+      addData(SUBJECT, CONTENT)
 
       setInputs({
         SUBJECT: '',
@@ -61,19 +97,21 @@ const Notice = () => {
     } else {
       alert('값을 입력해주세요')
     }
+    axios.get('http://localhost:3005/api/notice/list', {}) //post후에 바로 반영되도록 get
     focusInput.current.focus()
+    setModal(false)
   }
   const onDeleteList = (idx) => {
     setList(list.filter((e) => e.ID !== idx))
+
+    axios.post('http://localhost:3005/api/notice/remove', {
+      id: idx,
+    })
   }
-  //useEffect
-  useEffect(() => {
-    // async function fetchData() {
-    //   const res = await axios.get('http://localhost:3005/api/notice/list')
-    //   setList(res.data.data)
-    // }
-    // return fetchData()
-  }, [])
+  const onChangePagination = (page) => {
+    setCurrentPage(page)
+  }
+
   return (
     <>
       <CCard>
@@ -114,42 +152,56 @@ const Notice = () => {
             </CTableBody>
           </CTable>
 
-          <CPagination aria-label="Page navigation example" style={styleCenter}>
-            <CPaginationItem aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </CPaginationItem>
-
-            <CPaginationItem aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </CPaginationItem>
-          </CPagination>
+          <RCPagination
+            style={styleCenter}
+            onChange={() => {
+              onChangePagination(30)
+            }}
+            pageSize={5}
+            current={currentPage}
+            total={list.length}
+          />
         </CCardBody>
       </CCard>
-      <div>
-        <form onSubmit={onSubmitForm}>
+
+      <div style={writeBox}>
+        <button type="button" onClick={() => setModal(true)}>
+          글쓰기
+        </button>
+      </div>
+
+      <Modal
+        isOpen={modal}
+        onRequestClose={() => setModal(false)}
+        style={{ overlay: { zIndex: 9999999 } }}
+      >
+        <form onSubmit={onSubmitForm} className="modal__form">
           <fieldset>
             <legend>게시글 추가</legend>
-            <label htmlFor={'SUBJECT'}>게시글 SUBJECT</label>
-            <input
+            <label htmlFor={'SUBJECT'}>SUBJECT</label>
+            <textarea
               name="SUBJECT"
               className="SUBJECT"
               value={SUBJECT}
               onChange={onChangeInput}
               ref={focusInput}
-            ></input>
+            ></textarea>
 
-            <label htmlFor={'CONTENT'}>게시글 CONTENT</label>
-            <input
+            <label htmlFor={'CONTENT'}>CONTENT</label>
+            <textarea
               name="CONTENT"
               className="CONTENT"
               value={CONTENT}
               onChange={onChangeInput}
-            ></input>
-            <button type="submit">go</button>
+            ></textarea>
+            <button type="submit">글쓰기</button>
           </fieldset>
         </form>
-      </div>
 
+        <button className="modal__btn--close" onClick={() => setModal(false)}>
+          창 닫기
+        </button>
+      </Modal>
     </>
   )
 }
