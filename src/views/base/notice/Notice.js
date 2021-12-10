@@ -1,61 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import RCPagination from 'rc-pagination'
-// import '../../assets/index.less';
-// import 'rc-select/assets/index.less';
-import '../../../../node_modules/rc-pagination/assets/index.css'
-import Modal from 'react-modal'
-import {
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CCol,
-  CRow,
-  CTable,
-  CTableBody,
-  CTableCaption,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
-  CPagination,
-  CPaginationItem,
-} from '@coreui/react'
-Modal.setAppElement('#root')
+
+import AddModal from './component/AddModal'
+import DataTable from './component/DataTable'
+import PropTypes from 'prop-types'
+
 const Notice = () => {
-  //style
-  const styleCenter = {
-    display: 'flex',
-    justifyContent: 'center',
-  }
-  const writeBox = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-  }
-  // var
+  //state
   const [list, setList] = useState([])
   const [inputs, setInputs] = useState({
     SUBJECT: '',
     CONTENT: '',
   })
-  const [modal, setModal] = useState(false)
-  // pagination
-  const [currentPage, setCurrentPage] = useState(3)
+  const [addModal, setAddModal] = useState(false)
+
   const { SUBJECT, CONTENT } = inputs
   const focusInput = useRef()
 
-  useEffect(async () => {
+  useEffect(() => {
     try {
-      // const res = await axios.get('http://localhost:3005/api/notice/list', {})
-      // setList(res.data.data)
-
-      const res = await axios.get(`http://localhost:3005/api/notice/get?id=1`, {})
-      console.log(res.data.data)
+      getData()
     } catch (e) {
       console.error(e.message)
     }
   }, [])
 
+  //method
+  const getData = async () => {
+    await axios.get(`http://localhost:3005/api/notice/list`).then((res) => setList(res.data.data))
+  }
   const addData = async (subjectValue, contentValue) => {
     try {
       const res = await axios.post('http://localhost:3005/api/notice/create', {
@@ -67,8 +40,13 @@ const Notice = () => {
       console.log(e)
     }
   }
+  const deleteData = (idx) => {
+    setList(list.filter((e) => e.ID !== idx))
+    axios.post('http://localhost:3005/api/notice/remove', {
+      id: idx,
+    })
+  }
 
-  //methods
   const onChangeInput = (e) => {
     const { value, name } = e.target
     setInputs({
@@ -99,110 +77,37 @@ const Notice = () => {
     }
     axios.get('http://localhost:3005/api/notice/list', {}) //post후에 바로 반영되도록 get
     focusInput.current.focus()
-    setModal(false)
-  }
-  const onDeleteList = (idx) => {
-    setList(list.filter((e) => e.ID !== idx))
-
-    axios.post('http://localhost:3005/api/notice/remove', {
-      id: idx,
-    })
-  }
-  const onChangePagination = (page) => {
-    setCurrentPage(page)
+    setAddModal(false)
   }
 
   return (
     <>
-      <CCard>
-        <CCardHeader>
-          <strong>게시판</strong> <small>Fetch</small>
-        </CCardHeader>
-        <CCardBody>
-          <CTable striped>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">id</CTableHeaderCell>
-                <CTableHeaderCell scope="col">SUBJECT</CTableHeaderCell>
-                <CTableHeaderCell scope="col">CONTENT</CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
+      <DataTable
+        list={list}
+        setList={setList}
+        setAddModal={setAddModal}
+        getData={getData}
+        deleteData={deleteData}
+        onChangeInput={onChangeInput}
+        SUBJECT={SUBJECT}
+        CONTENT={CONTENT}
+      />
 
-            <CTableBody>
-              {list.map((e, i) => {
-                return (
-                  <>
-                    <CTableRow key={e.id}>
-                      <CTableDataCell>{e.ID}</CTableDataCell>
-                      <CTableDataCell>{e.SUBJECT}</CTableDataCell>
-                      <CTableDataCell>{e.CONTENT}</CTableDataCell>
-                      <CTableDataCell>
-                        <button
-                          onClick={() => {
-                            onDeleteList(e.ID)
-                          }}
-                        >
-                          삭제
-                        </button>
-                      </CTableDataCell>
-                    </CTableRow>
-                  </>
-                )
-              })}
-            </CTableBody>
-          </CTable>
-
-          <RCPagination
-            style={styleCenter}
-            onChange={() => {
-              onChangePagination(30)
-            }}
-            pageSize={5}
-            current={currentPage}
-            total={list.length}
-          />
-        </CCardBody>
-      </CCard>
-
-      <div style={writeBox}>
-        <button type="button" onClick={() => setModal(true)}>
-          글쓰기
-        </button>
-      </div>
-
-      <Modal
-        isOpen={modal}
-        onRequestClose={() => setModal(false)}
-        style={{ overlay: { zIndex: 9999999 } }}
-      >
-        <form onSubmit={onSubmitForm} className="modal__form">
-          <fieldset>
-            <legend>게시글 추가</legend>
-            <label htmlFor={'SUBJECT'}>SUBJECT</label>
-            <textarea
-              name="SUBJECT"
-              className="SUBJECT"
-              value={SUBJECT}
-              onChange={onChangeInput}
-              ref={focusInput}
-            ></textarea>
-
-            <label htmlFor={'CONTENT'}>CONTENT</label>
-            <textarea
-              name="CONTENT"
-              className="CONTENT"
-              value={CONTENT}
-              onChange={onChangeInput}
-            ></textarea>
-            <button type="submit">글쓰기</button>
-          </fieldset>
-        </form>
-
-        <button className="modal__btn--close" onClick={() => setModal(false)}>
-          창 닫기
-        </button>
-      </Modal>
+      <AddModal
+        addModal={addModal}
+        setAddModal={setAddModal}
+        onSubmitForm={onSubmitForm}
+        onChangeInput={onChangeInput}
+        focusInput={focusInput}
+        SUBJECT={SUBJECT}
+        CONTENT={CONTENT}
+      />
     </>
   )
 }
+
+Notice.propsTypes = {
+  modal: PropTypes.bool.isRequired,
+}
+
 export default Notice

@@ -21,6 +21,7 @@ module.exports = {
   plugins: ['react', 'react-hooks', 'prettier'],
   rules: {
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    'react/prop-types': ['off'],
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
   },
