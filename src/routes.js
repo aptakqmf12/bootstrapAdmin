@@ -18,6 +18,8 @@ const Progress = React.lazy(() => import('./views/base/progress/Progress'))
 const Spinners = React.lazy(() => import('./views/base/spinners/Spinners'))
 const Tables = React.lazy(() => import('./views/base/tables/Tables'))
 const Notice = React.lazy(() => import('./views/base/notice/Notice'))
+const Test = React.lazy(() => import('./views/base/test/Test'))
+const Reducer = React.lazy(() => import('./views/base/useReducer/Reducer'))
 const Tooltips = React.lazy(() => import('./views/base/tooltips/Tooltips'))
 
 // Buttons
@@ -70,6 +72,8 @@ const routes = [
   { path: '/base/spinners', name: 'Spinners', component: Spinners },
   { path: '/base/tables', name: 'Tables', component: Tables },
   { path: '/base/notice', name: 'Notice', component: Notice },
+  { path: '/base/test', name: 'Test', component: Test },
+  { path: '/base/useReducer', name: 'Reducer', component: Reducer },
   { path: '/base/tooltips', name: 'Tooltips', component: Tooltips },
   { path: '/buttons', name: 'Buttons', component: Buttons, exact: true },
   { path: '/buttons/buttons', name: 'Buttons', component: Buttons },

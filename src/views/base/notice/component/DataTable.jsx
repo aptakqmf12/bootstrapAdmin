@@ -32,29 +32,30 @@ const DataTable = ({
   onChangeInput,
   SUBJECT,
   CONTENT,
+  setInputs,
 }) => {
-  const [pageSize, setPageSize] = useState(10)
-  const [modifyModal, setModifyModal] = useState(false)
-  const [modifyIndex, setModifyIndex] = useState(0)
-  // pagination
-  const [currentPage, setCurrentPage] = useState(3)
-
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  const lastIndex = currentPage * perPage
+  const firstIndex = lastIndex - perPage
+  const slicedList = list && list.slice(firstIndex, lastIndex)
   const onChangePagination = (page) => {
     setCurrentPage(page)
+    console.log(page)
   }
 
+  const [modifyModal, setModifyModal] = useState(false)
+  const [modifyIndex, setModifyIndex] = useState(0)
   const openModifyModal = (idx) => {
-    console.log(idx)
     setModifyModal(true)
     setModifyIndex(idx)
-    //여기서 받은 idx값을 ModifyModal에 전달해주고
-    // ModifyModal에서는 해당 idx값을 가진 요소의 제목,콘텐츠를 바꾼다
   }
   return (
     <>
       <CCard>
         <CCardHeader>
-          <strong>게시판</strong> <small>{pageSize}개씩 출력</small>
+          <strong>게시판</strong> <small>{perPage}개씩 출력</small>
         </CCardHeader>
         <CCardBody>
           <CTable striped>
@@ -68,45 +69,46 @@ const DataTable = ({
             </CTableHead>
 
             <CTableBody>
-              {list.map((e, i) => {
-                return (
-                  <>
-                    <CTableRow key={e.id}>
-                      <CTableDataCell>{e.ID}</CTableDataCell>
-                      <CTableDataCell>{e.SUBJECT}</CTableDataCell>
-                      <CTableDataCell>{e.CONTENT}</CTableDataCell>
-                      <CTableDataCell>{e.CREATED}</CTableDataCell>
-                      <CTableDataCell>
-                        <button
-                          onClick={() => {
-                            deleteData(e.ID)
-                          }}
-                        >
-                          삭제
-                        </button>
-                        <button
-                          onClick={() => {
-                            openModifyModal(e.ID)
-                          }}
-                        >
-                          수정
-                        </button>
-                      </CTableDataCell>
-                    </CTableRow>
-                  </>
-                )
-              })}
+              {slicedList &&
+                slicedList.map((e, i) => {
+                  return (
+                    <>
+                      <CTableRow key={e.id}>
+                        <CTableDataCell>{e.ID}</CTableDataCell>
+                        <CTableDataCell>{e.SUBJECT}</CTableDataCell>
+                        <CTableDataCell>{e.CONTENT}</CTableDataCell>
+                        <CTableDataCell>{e.CREATED}</CTableDataCell>
+                        <CTableDataCell>
+                          <button
+                            onClick={() => {
+                              deleteData(e.ID)
+                            }}
+                          >
+                            삭제
+                          </button>
+                          <button
+                            onClick={() => {
+                              openModifyModal(e.ID)
+                            }}
+                          >
+                            수정
+                          </button>
+                        </CTableDataCell>
+                      </CTableRow>
+                    </>
+                  )
+                })}
             </CTableBody>
           </CTable>
 
           <RCPagination
             style={styleCenter}
-            onChange={() => {
-              onChangePagination(30)
+            onChange={(page) => {
+              setCurrentPage(page)
             }}
-            pageSize={pageSize}
+            perPage={perPage}
             current={currentPage}
-            total={list.length}
+            total={list && list.length}
           />
         </CCardBody>
       </CCard>
@@ -127,6 +129,7 @@ const DataTable = ({
         onChangeInput={onChangeInput}
         SUBJECT={SUBJECT}
         CONTENT={CONTENT}
+        setInputs={setInputs}
       />
     </>
   )

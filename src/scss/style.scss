@@ -16,6 +16,37 @@ $enable-rtl: true;
 // If you want to add custom CSS you can put it here.
 @import 'custom';
 
+//reset
+button {
+  background-color: transparent;
+  border-radius: 5px;
+}
+
+//notice
+.table {
+  tr {
+    &:nth-child(2n-1) {
+      td {
+        .delete__btn:hover,
+        .modify__btn:hover {
+          background-color: #fff;
+          color: #000;
+        }
+      }
+    }
+    td {
+      .delete__btn {
+        margin-right: 5px;
+      }
+      .delete__btn:hover,
+      .modify__btn:hover {
+        background-color: #666;
+        color: #fff;
+      }
+    }
+  }
+}
+
 .modal__form {
   display: block;
   width: 100%;
@@ -27,18 +58,16 @@ $enable-rtl: true;
       & + textarea {
         display: block;
         width: 100%;
-        height: 300px;
+        height: 100px;
         margin-bottom: 20px;
         resize: none;
       }
     }
     button[type='submit'] {
-      display: flex;
-      justify-content: flex-end;
+      float: right;
     }
   }
 }
-
 .modal__btn--close {
   position: absolute;
   top: 20px;

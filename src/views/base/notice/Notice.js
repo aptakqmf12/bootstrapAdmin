@@ -1,21 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-
 import AddModal from './component/AddModal'
 import DataTable from './component/DataTable'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 
 const Notice = () => {
   //state
+  const [loading, setLoading] = useState(true)
   const [list, setList] = useState([])
   const [inputs, setInputs] = useState({
     SUBJECT: '',
     CONTENT: '',
   })
-  const [addModal, setAddModal] = useState(false)
-
   const { SUBJECT, CONTENT } = inputs
+  const [addModal, setAddModal] = useState(false)
   const focusInput = useRef()
+
+  // useEffect(() => {
+  //   setLoading(true)
+  // }, [])
 
   useEffect(() => {
     try {
@@ -28,14 +32,16 @@ const Notice = () => {
   //method
   const getData = async () => {
     await axios.get(`http://localhost:3005/api/notice/list`).then((res) => setList(res.data.data))
+    setLoading(true)
   }
   const addData = async (subjectValue, contentValue) => {
     try {
       const res = await axios.post('http://localhost:3005/api/notice/create', {
-        id: 0,
         subject: subjectValue,
         content: contentValue,
       })
+
+      getData()
     } catch (e) {
       console.log(e)
     }
@@ -54,6 +60,7 @@ const Notice = () => {
       [name]: value,
     })
   }
+
   const onSubmitForm = (e) => {
     e.preventDefault()
     if (SUBJECT !== '' && CONTENT !== '') {
@@ -61,11 +68,10 @@ const Notice = () => {
         ...list,
         {
           //post 보낼땐 camel케이스로.
-          ID: list.length + 1, //데이터로 받은 list다음에 붙이기
           SUBJECT: SUBJECT,
           CONTENT: CONTENT,
         },
-      ])
+      ]) //불변성 지킬필요없는지 삭제 해보기
       addData(SUBJECT, CONTENT)
 
       setInputs({
@@ -75,13 +81,16 @@ const Notice = () => {
     } else {
       alert('값을 입력해주세요')
     }
-    axios.get('http://localhost:3005/api/notice/list', {}) //post후에 바로 반영되도록 get
-    focusInput.current.focus()
+    getData() //post후에 바로 반영되도록 get
+    focusInput.current.focus() //확인
+
     setAddModal(false)
   }
 
   return (
     <>
+      {loading ?? <div>loading</div>}
+
       <DataTable
         list={list}
         setList={setList}
@@ -91,6 +100,7 @@ const Notice = () => {
         onChangeInput={onChangeInput}
         SUBJECT={SUBJECT}
         CONTENT={CONTENT}
+        setInputs={setInputs}
       />
 
       <AddModal
@@ -101,10 +111,16 @@ const Notice = () => {
         focusInput={focusInput}
         SUBJECT={SUBJECT}
         CONTENT={CONTENT}
+        setInputs={setInputs}
       />
     </>
   )
 }
+
+// export const Loading = () => {
+//   const LoadingBox = styled.div``
+//   return <div style={style}>loading</div>
+// }
 
 Notice.propsTypes = {
   modal: PropTypes.bool.isRequired,

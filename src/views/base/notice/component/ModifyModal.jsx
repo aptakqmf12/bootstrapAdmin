@@ -14,6 +14,7 @@ const ModifyModal = ({
   onChangeInput,
   SUBJECT,
   CONTENT,
+  setInputs,
 }) => {
   const onSubmitFormModify = () => async (e) => {
     e.preventDefault()
@@ -24,6 +25,14 @@ const ModifyModal = ({
     })
     await getData()
     setModifyModal(false)
+  }
+  const closeModal = () => {
+    console.log('close modal', SUBJECT)
+    setModifyModal(false)
+    setInputs({
+      SUBJECT: '',
+      CONTENT: '',
+    })
   }
 
   return (
@@ -56,7 +65,7 @@ const ModifyModal = ({
             <button type="submit">수정</button>
           </fieldset>
         </form>
-        <button className="modal__btn--close" onClick={() => setModifyModal(false)}>
+        <button className="modal__btn--close" onClick={closeModal}>
           창 닫기
         </button>
       </Modal>

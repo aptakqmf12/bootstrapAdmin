@@ -48,7 +48,9 @@
     "react-redux": "^7.2.5",
     "react-router-dom": "^5.3.0",
     "redux": "4.1.1",
-    "simplebar-react": "^2.3.6"
+    "simplebar-react": "^2.3.6",
+    "styled-components": "^5.3.3",
+    "swr": "^1.1.1"
   },
   "devDependencies": {
     "auto-changelog": "~2.3.0",

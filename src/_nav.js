@@ -118,6 +118,16 @@ const _nav = [
       },
       {
         component: CNavItem,
+        name: 'Test',
+        to: '/base/test',
+      },
+      {
+        component: CNavItem,
+        name: 'ReducerExample',
+        to: '/base/useReducer',
+      },
+      {
+        component: CNavItem,
         name: 'Tooltips',
         to: '/base/tooltips',
       },

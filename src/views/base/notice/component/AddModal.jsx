@@ -10,7 +10,15 @@ const AddModal = ({
   focusInput,
   SUBJECT,
   CONTENT,
+  setInputs,
 }) => {
+  const closeModal = () => {
+    setAddModal(false)
+    setInputs({
+      SUBJECT: '',
+      CONTENT: '',
+    })
+  }
   return (
     <>
       <Modal
@@ -41,7 +49,7 @@ const AddModal = ({
           </fieldset>
         </form>
 
-        <button className="modal__btn--close" onClick={() => setAddModal(false)}>
+        <button className="modal__btn--close" onClick={closeModal}>
           창 닫기
         </button>
       </Modal>
