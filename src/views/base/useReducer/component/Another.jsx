@@ -5,7 +5,7 @@ const Another = () => {
   const { dispatch, cellText } = useContext(tableContext)
   return (
     <>
-      <div>어나더!{cellText}</div>
+      <div>어나더레븰!{cellText}</div>
     </>
   )
 }
